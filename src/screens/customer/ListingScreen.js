@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, FlatList, TouchableOpacity, Image, Dimensions } from 'react-native';
+import { View, Text, StyleSheet, FlatList, TouchableOpacity, Image, Dimensions, ScrollView } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import Animated, { FadeIn } from 'react-native-reanimated';
@@ -45,19 +45,15 @@ export default function ListingScreen({ route, navigation }) {
 
   // Handle filter logic
   const filteredListings = FEATURED_VENDORS.filter((item) => {
-    // 1. Search Query Match
     const matchesSearch = item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       item.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
       item.location.toLowerCase().includes(searchQuery.toLowerCase());
 
-    // 2. Category Match
     const matchesCategory = !selectedCategory || item.category === selectedCategory;
 
-    // 3. Price Filter Match
     const activePrice = PRICE_FILTERS.find((f) => f.id === selectedPriceFilter);
     const matchesPrice = item.priceValue >= activePrice.min && item.priceValue <= activePrice.max;
 
-    // 4. Rating Match
     const matchesRating = !onlyHighRated || item.rating >= 4.8;
 
     return matchesSearch && matchesCategory && matchesPrice && matchesRating;
@@ -121,7 +117,6 @@ export default function ListingScreen({ route, navigation }) {
 
       {/* Filter Options Bar */}
       <View style={styles.filterOptionsBar}>
-        {/* Price filters scroll */}
         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.priceFilterScroll}>
           {PRICE_FILTERS.map((f) => (
             <TouchableOpacity
@@ -143,7 +138,6 @@ export default function ListingScreen({ route, navigation }) {
               </Text>
             </TouchableOpacity>
           ))}
-          {/* High rated toggle */}
           <TouchableOpacity
             style={[styles.priceFilterBtn, onlyHighRated && styles.activePriceFilterBtn]}
             onPress={() => setOnlyHighRated(!onlyHighRated)}
@@ -175,23 +169,23 @@ export default function ListingScreen({ route, navigation }) {
         contentContainerStyle={styles.listContent}
         renderItem={({ item, index }) => (
           <Animated.View entering={FadeIn.delay(index * 50).duration(400)}>
-            <Card style={styles.listingCard} elevation="small">
-              {/* Image banner */}
+            <Card
+              style={styles.listingCard}
+              elevation="small"
+              onPress={() => navigation.navigate('VendorDetails', { vendorId: item.id })}
+            >
               <View style={styles.imageWrapper}>
                 <Image source={{ uri: item.image }} style={styles.vendorImage} />
                 <View style={styles.badgeRow}>
-                  {/* Category Tag */}
                   <View style={styles.categoryBadge}>
                     <Text style={styles.categoryBadgeText}>{item.category}</Text>
                   </View>
-                  {/* Availability Badge */}
                   <View style={[styles.availabilityBadge, { backgroundColor: getAvailabilityColor(item.availability) }]}>
                     <Text style={styles.availabilityBadgeText}>{item.availability}</Text>
                   </View>
                 </View>
               </View>
 
-              {/* Vendor details */}
               <View style={styles.cardDetails}>
                 <View style={styles.titleRow}>
                   <Text style={styles.vendorTitle} numberOfLines={1}>
@@ -219,7 +213,11 @@ export default function ListingScreen({ route, navigation }) {
                     <Text style={styles.priceLabel}>Starting from</Text>
                     <Text style={styles.priceVal}>{item.price}</Text>
                   </View>
-                  <TouchableOpacity style={styles.bookBtn} activeOpacity={0.8}>
+                  <TouchableOpacity
+                    style={styles.bookBtn}
+                    activeOpacity={0.8}
+                    onPress={() => navigation.navigate('VendorDetails', { vendorId: item.id })}
+                  >
                     <Text style={styles.bookBtnText}>Book Now</Text>
                   </TouchableOpacity>
                 </View>
