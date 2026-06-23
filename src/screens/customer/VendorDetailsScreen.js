@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, Image, TouchableOpacity, FlatList, Dimensions, Modal } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Image, TouchableOpacity, Dimensions } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import Animated, { FadeInUp, SlideInDown } from 'react-native-reanimated';
 import { theme } from '../../theme/theme';
 import Button from '../../components/Button';
 import Card from '../../components/Card';
@@ -10,12 +9,10 @@ import { FEATURED_VENDORS } from '../../mockData';
 
 const { width } = Dimensions.get('window');
 
-// Custom static calendar helper for June 2026 (starts on Monday, 30 days)
 const CALENDAR_DAYS = Array.from({ length: 30 }, (_, i) => {
   const dayNum = i + 1;
   const dateStr = `2026-06-${dayNum < 10 ? '0' + dayNum : dayNum}`;
   const daysOfWeek = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-  // June 1st, 2026 is a Monday (0)
   const dayName = daysOfWeek[i % 7];
   return { dateStr, dayNum, dayName };
 });
@@ -24,18 +21,18 @@ export default function VendorDetailsScreen({ route, navigation }) {
   const insets = useSafeAreaInsets();
   const { vendorId } = route.params;
 
-  // Retrieve matching vendor details
   const vendor = FEATURED_VENDORS.find((v) => v.id === vendorId) || FEATURED_VENDORS[0];
-
   const [selectedDate, setSelectedDate] = useState(null);
-  const [successModalVisible, setSuccessModalVisible] = useState(false);
 
   const handleBookingRequest = () => {
     if (!selectedDate) {
       alert('Please select a booking date from the availability calendar.');
       return;
     }
-    setSuccessModalVisible(true);
+    navigation.navigate('BookingForm', {
+      vendorId: vendor.id,
+      selectedDate: selectedDate,
+    });
   };
 
   return (
@@ -171,54 +168,6 @@ export default function VendorDetailsScreen({ route, navigation }) {
           style={styles.ctaButton}
         />
       </View>
-
-      {/* Booking Success Modal */}
-      <Modal
-        animationType="slide"
-        transparent={true}
-        visible={successModalVisible}
-        onRequestClose={() => setSuccessModalVisible(false)}
-      >
-        <View style={styles.modalOverlay}>
-          <Animated.View entering={SlideInDown} style={styles.modalContent}>
-            <View style={styles.successIconWrapper}>
-              <MaterialCommunityIcons name="check-decagram" size={64} color={theme.colors.success} />
-            </View>
-            <Text style={styles.modalTitle}>Request Submitted!</Text>
-            <Text style={styles.modalSubtitle}>
-              Your booking request for **{vendor.name}** on **{selectedDate}** has been sent to the vendor. They will respond shortly.
-            </Text>
-            <Card style={styles.summaryCard} elevation="small">
-              <Text style={styles.summaryTitle}>Booking Summary</Text>
-              <View style={styles.summaryRow}>
-                <Text style={styles.summaryLabel}>Vendor:</Text>
-                <Text style={styles.summaryValue}>{vendor.name}</Text>
-              </View>
-              <View style={styles.summaryRow}>
-                <Text style={styles.summaryLabel}>Category:</Text>
-                <Text style={styles.summaryValue}>{vendor.category}</Text>
-              </View>
-              <View style={styles.summaryRow}>
-                <Text style={styles.summaryLabel}>Date Selected:</Text>
-                <Text style={styles.summaryValue}>{selectedDate}</Text>
-              </View>
-              <View style={styles.summaryRow}>
-                <Text style={styles.summaryLabel}>Ref ID:</Text>
-                <Text style={styles.summaryValue}>#ES-82{Math.floor(Math.random() * 900) + 100}</Text>
-              </View>
-            </Card>
-            <Button
-              title="Return to Home"
-              variant="primary"
-              onPress={() => {
-                setSuccessModalVisible(false);
-                navigation.navigate('CustomerHome');
-              }}
-              style={styles.closeBtn}
-            />
-          </Animated.View>
-        </View>
-      </Modal>
     </View>
   );
 }
@@ -229,7 +178,7 @@ const styles = StyleSheet.create({
     backgroundColor: theme.colors.background,
   },
   scrollContent: {
-    paddingBottom: 100, // Room for bottom sticky bar
+    paddingBottom: 100,
   },
   imageGalleryContainer: {
     position: 'relative',
@@ -474,68 +423,5 @@ const styles = StyleSheet.create({
   ctaButton: {
     flex: 1,
     marginLeft: theme.spacing.lg,
-  },
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: 'rgba(17, 24, 27, 0.5)',
-    justifyContent: 'flex-end',
-  },
-  modalContent: {
-    backgroundColor: theme.colors.white,
-    borderTopLeftRadius: theme.borderRadius.xl,
-    borderTopRightRadius: theme.borderRadius.xl,
-    padding: theme.spacing.lg,
-    alignItems: 'center',
-  },
-  successIconWrapper: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    backgroundColor: theme.colors.primaryLight,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: theme.spacing.md,
-  },
-  modalTitle: {
-    fontSize: theme.typography.sizes.xl,
-    fontWeight: theme.typography.weights.extrabold,
-    color: theme.colors.textPrimary,
-    textAlign: 'center',
-  },
-  modalSubtitle: {
-    fontSize: theme.typography.sizes.sm,
-    color: theme.colors.textSecondary,
-    textAlign: 'center',
-    marginVertical: theme.spacing.sm,
-    lineHeight: 20,
-  },
-  summaryCard: {
-    width: '100%',
-    marginVertical: theme.spacing.md,
-  },
-  summaryTitle: {
-    fontSize: theme.typography.sizes.md,
-    fontWeight: theme.typography.weights.bold,
-    color: theme.colors.textPrimary,
-    marginBottom: theme.spacing.xs,
-  },
-  summaryRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginVertical: 4,
-  },
-  summaryLabel: {
-    fontSize: theme.typography.sizes.sm,
-    color: theme.colors.textSecondary,
-  },
-  summaryValue: {
-    fontSize: theme.typography.sizes.sm,
-    fontWeight: theme.typography.weights.bold,
-    color: theme.colors.textPrimary,
-  },
-  closeBtn: {
-    width: '100%',
-    marginTop: theme.spacing.sm,
-    marginBottom: theme.spacing.md,
   },
 });
