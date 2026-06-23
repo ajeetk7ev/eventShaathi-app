@@ -3,7 +3,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { theme } from '../theme/theme';
 
-import CustomerHomeScreen from '../screens/customer/CustomerHomeScreen';
+import CustomerExploreNavigator from './CustomerExploreNavigator';
 import CustomerBookingsScreen from '../screens/customer/CustomerBookingsScreen';
 import CustomerProfileScreen from '../screens/customer/CustomerProfileScreen';
 
@@ -43,7 +43,7 @@ export default function CustomerTabNavigator() {
         },
       })}
     >
-      <Tab.Screen name="Explore" component={CustomerHomeScreen} />
+      <Tab.Screen name="Explore" component={CustomerExploreNavigator} />
       <Tab.Screen name="Bookings" component={CustomerBookingsScreen} />
       <Tab.Screen name="Profile" component={CustomerProfileScreen} />
     </Tab.Navigator>

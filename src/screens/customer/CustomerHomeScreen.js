@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, Image, TouchableOpacity, FlatList, Dimensions } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Image, TouchableOpacity, Dimensions } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import Animated, { FadeInUp, FadeInDown } from 'react-native-reanimated';
@@ -11,7 +11,7 @@ import { EVENT_TYPES, CATEGORIES, FEATURED_VENDORS } from '../../mockData';
 
 const { width } = Dimensions.get('window');
 
-export default function CustomerHomeScreen() {
+export default function CustomerHomeScreen({ navigation }) {
   const insets = useSafeAreaInsets();
   const user = useUserStore((state) => state.user);
   const logout = useUserStore((state) => state.logout);
@@ -19,12 +19,15 @@ export default function CustomerHomeScreen() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedEventType, setSelectedEventType] = useState(null);
 
-  // Filter vendors based on category/search if desired
   const filteredVendors = FEATURED_VENDORS.filter((vendor) => {
     const matchesSearch = vendor.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       vendor.category.toLowerCase().includes(searchQuery.toLowerCase());
     return matchesSearch;
   });
+
+  const handleSearchSubmit = () => {
+    navigation.navigate('Listing', { query: searchQuery });
+  };
 
   return (
     <View style={[styles.container, { paddingTop: insets.top }]}>
@@ -55,7 +58,8 @@ export default function CustomerHomeScreen() {
             value={searchQuery}
             onChangeText={setSearchQuery}
             placeholder="Search DJ, Venue, Photographer..."
-            onFilterPress={() => {}}
+            onFilterPress={() => navigation.navigate('Listing')}
+            onSubmitEditing={handleSearchSubmit}
           />
         </Animated.View>
 
@@ -76,7 +80,10 @@ export default function CustomerHomeScreen() {
                     styles.eventTypeCard,
                     isSelected && { backgroundColor: theme.colors.primaryLight, borderColor: theme.colors.primary },
                   ]}
-                  onPress={() => setSelectedEventType(isSelected ? null : item.id)}
+                  onPress={() => {
+                    setSelectedEventType(isSelected ? null : item.id);
+                    navigation.navigate('Listing', { selectedOccasion: item.name });
+                  }}
                   activeOpacity={0.8}
                 >
                   <View style={[styles.eventTypeIconWrapper, { backgroundColor: item.color + '15' }]}>
@@ -95,13 +102,18 @@ export default function CustomerHomeScreen() {
         <Animated.View entering={FadeInUp.delay(300).duration(600)} style={styles.sectionContainer}>
           <View style={styles.sectionHeader}>
             <Text style={styles.sectionTitle}>Browse Categories</Text>
-            <TouchableOpacity>
+            <TouchableOpacity onPress={() => navigation.navigate('Listing')}>
               <Text style={styles.seeAllText}>See All</Text>
             </TouchableOpacity>
           </View>
           <View style={styles.gridContainer}>
             {CATEGORIES.map((item) => (
-              <TouchableOpacity key={item.id} style={styles.gridItem} activeOpacity={0.7}>
+              <TouchableOpacity
+                key={item.id}
+                style={styles.gridItem}
+                activeOpacity={0.7}
+                onPress={() => navigation.navigate('Listing', { selectedCategory: item.name })}
+              >
                 <View style={[styles.gridIconWrapper, { backgroundColor: item.color + '10' }]}>
                   <MaterialCommunityIcons name={item.icon} size={24} color={item.color} />
                 </View>
@@ -117,8 +129,8 @@ export default function CustomerHomeScreen() {
         <Animated.View entering={FadeInDown.delay(400).duration(600)} style={[styles.sectionContainer, styles.vendorsSection]}>
           <View style={styles.sectionHeader}>
             <Text style={styles.sectionTitle}>Featured Services</Text>
-            <TouchableOpacity>
-              <Text style={styles.seeAllText}>View Map</Text>
+            <TouchableOpacity onPress={() => navigation.navigate('Listing')}>
+              <Text style={styles.seeAllText}>View All</Text>
             </TouchableOpacity>
           </View>
 
@@ -129,7 +141,12 @@ export default function CustomerHomeScreen() {
             </View>
           ) : (
             filteredVendors.map((item) => (
-              <Card key={item.id} style={styles.vendorCard} elevation="small">
+              <Card
+                key={item.id}
+                style={styles.vendorCard}
+                elevation="small"
+                onPress={() => navigation.navigate('Listing', { searchWord: item.name })}
+              >
                 <Image source={{ uri: item.image }} style={styles.vendorImage} />
                 <View style={styles.tagContainer}>
                   <Text style={styles.tagText}>{item.category}</Text>
