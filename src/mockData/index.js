@@ -1,0 +1,47 @@
+export const CATEGORIES = [
+  { id: '1', name: 'Venues', icon: 'map-marker-radius', color: '#6C63FF' },
+  { id: '2', name: 'Catering', icon: 'food', color: '#10B981' },
+  { id: '3', name: 'Photography', icon: 'camera', color: '#0284C7' },
+  { id: '4', name: 'Decoration', icon: 'flower', color: '#EC4899' },
+  { id: '5', name: 'Music & DJ', icon: 'music', color: '#F59E0B' },
+  { id: '6', name: 'Makeup Artist', icon: 'face-woman', color: '#8B5CF6' },
+];
+
+export const FEATURED_VENDORS = [
+  {
+    id: 'v1',
+    name: 'The Royal Grand Pavilion',
+    category: 'Venues',
+    rating: 4.9,
+    reviewsCount: 124,
+    price: '₹1,50,000/day',
+    location: 'Chhatarpur, New Delhi',
+    image: 'https://images.unsplash.com/photo-1519167758481-83f550bb49b3?q=80&w=600&auto=format&fit=crop',
+    featured: true,
+    description: 'A luxurious banqueting setup with lush green lawns and a capacity of up to 1500 guests.',
+  },
+  {
+    id: 'v2',
+    name: 'Epicurean Delights Catering',
+    category: 'Catering',
+    rating: 4.8,
+    reviewsCount: 88,
+    price: '₹1,200/plate',
+    location: 'Indiranagar, Bangalore',
+    image: 'https://images.unsplash.com/photo-1555244162-803834f70033?q=80&w=600&auto=format&fit=crop',
+    featured: true,
+    description: 'Gourmet multi-cuisine catering featuring live stations, signature mocktails, and professional service.',
+  },
+  {
+    id: 'v3',
+    name: 'Pixel Story Weddings',
+    category: 'Photography',
+    rating: 4.9,
+    reviewsCount: 95,
+    price: '₹75,000/day',
+    location: 'Bandra West, Mumbai',
+    image: 'https://images.unsplash.com/photo-1537633552985-df8429e8048b?q=80&w=600&auto=format&fit=crop',
+    featured: true,
+    description: 'Cinematic wedding photography, candid shots, and premium pre-wedding shoot experiences.',
+  },
+];
